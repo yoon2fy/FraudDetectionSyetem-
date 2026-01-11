@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import gc
 import lightgbm as lgb
 import pickle
+import shap
 
 from matplotlib import cm
 from tqdm import tqdm
@@ -602,8 +603,135 @@ valid_data
 
 # 검증
 score = roc_auc_score(valid_data['Class'], valid_data['pred'])
-
 print('ROC AUC Score = ', score)
 
+# XAI 모델 구현 --------------------------------------------------------- #
+# Tree 기반 모델용 explainer
+explainer = shap.TreeExplainer(model_4)
+
+# 검증 데이터 기준 SHAP 값 계산
+shap_values = explainer.shap_values(x_valid)
+
+# GloBal (1)
+shap.summary_plot(
+    shap_values,
+    x_valid,
+    plot_type="dot"
+)
+
+# GloBal (2)
+shap.summary_plot(
+    shap_values,
+    x_valid,
+    plot_type="bar"
+)
+
+## Local (1)
+idx = 0  # 보고 싶은 검증 데이터 인덱스
+
+shap.force_plot(
+    explainer.expected_value,
+    shap_values[idx],
+    x_valid.iloc[idx],
+    matplotlib=True
+)
+
+## Local (2)
+shap.dependence_plot(
+    'V17',
+    shap_values,
+    x_valid
+)
+
+# 앙상블 예측 확률
+y_pred_prob = final_model.predict_proba(x_valid)[:, 1]
+
+# 임계값 (기본 0.5)
+threshold = 0.5
+y_pred_label = (y_pred_prob > threshold).astype(int)
+
+# False Positive / False Negative 인덱스
+fp_idx = np.where((y_valid == 0) & (y_pred_label == 1))[0]
+fn_idx = np.where((y_valid == 1) & (y_pred_label == 0))[0]
+len(fp_idx), len(fn_idx)
 
 
+explainer = shap.TreeExplainer(model_4)
+shap_values = explainer.shap_values(x_valid)
+
+fp_sample = fp_idx[0]
+
+# 분석 1
+## False Positive 사례에서는 V17, V14 값이 사기 거래에서 자주 나타나는 패턴과 유사하게 작용하여 모델이 사기 거래로 판단하였다. 그러나 실제 라벨은 정상 거래로, 이는 특정 feature 조합이 정상 거래에서도 극단적으로 나타날 수 있음을 시사한다.
+shap.force_plot(
+    explainer.expected_value,
+    shap_values[fp_sample],
+    x_valid.iloc[fp_sample],
+    matplotlib=True
+)
+
+# 분석 2
+## False Negative 사례에서는 V17, V12 등의 주요 feature가 사기 거래를 강하게 시사할 만큼 극단적인 값을 가지지 않아 모델이 정상 거래로 오판하였다. 이는 사기 패턴이 점점 정상 거래와 유사해지는 경우 모델이 탐지에 실패할 수 있음을 보여준다.
+fn_sample = fn_idx[0]
+
+shap.force_plot(
+    explainer.expected_value,
+    shap_values[fn_sample],
+    x_valid.iloc[fn_sample],
+    matplotlib=True
+)
+
+# FP / FN SHAP 평균 절대값
+fp_shap_mean = np.abs(shap_values[fp_idx]).mean(axis=0)
+fn_shap_mean = np.abs(shap_values[fn_idx]).mean(axis=0)
+
+comparison_df = pd.DataFrame({
+    'Feature': x_valid.columns,
+    'FP_SHAP': fp_shap_mean,
+    'FN_SHAP': fn_shap_mean
+}).sort_values('FN_SHAP', ascending=False)
+
+comparison_df
+
+### 시각화
+## FP_SHAP ↑ → 정상 거래에서도 과민 반응하는 변수
+## FN_SHAP ↑ → 사기인데도 신호가 약한 변수
+
+
+# 상위 N개 feature만 시각화
+TOP_N = 10
+plot_df = comparison_df.head(TOP_N)
+
+x = np.arange(len(plot_df))
+width = 0.35
+
+plt.figure(figsize=(10, 6))
+
+# SHAP 스타일 색상
+fp_color = '#FF0051'   # SHAP red
+fn_color = '#008BFB'   # SHAP blue
+
+plt.barh(
+    x - width/2,
+    plot_df['FP_SHAP'],
+    height=width,
+    label='False Positive',
+    color=fp_color
+)
+
+plt.barh(
+    x + width/2,
+    plot_df['FN_SHAP'],
+    height=width,
+    label='False Negative',
+    color=fn_color
+)
+
+plt.yticks(x, plot_df['Feature'])
+plt.xlabel('Mean |SHAP value|')
+plt.title('FP vs FN SHAP Importance Comparison')
+plt.legend()
+plt.gca().invert_yaxis()
+
+plt.tight_layout()
+plt.show()
