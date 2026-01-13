@@ -55,17 +55,27 @@
 
 먼저 전체 데이터에 대해 결측치(Missing Data)여부를 확인한 결과, 모든 변수에서 결측치는 존재하지 않았다. 그 다음 이상치 점검의 경우, 데이터의 특성에 의하여 처리하지 않았다. 마지막으로 데이터 스케일링의 경우 `Log Transform`과 `Min-Max Scaling`을 진행하였다.
 이러한 전처리 과정을 통해 변수 간 상대적 영향력을 균형 있게 조정하였으며, 특정 변수의 크기 차이가 모델 학습에 과도한 영향을 미치는 문제를 최소화 하였다.
- 
-  - 
+
 ## 3.2. 데이터 시각화 및 분석
+본 절에는 전처리된 데이터를 바탕으로 PLS(Partial Least Squares) 기반 시각화 결과를 통해 정상 거래와 이상 거래의 분포 특성과 주요 변수의 기여도를 분석하였다. 특히 차원 축소 이후의 공간에서 클래스 간 분리 가능성과 변수 간 관계를 직관적으로 파악하는 데 목적이 있다.
+
+### 3.2.1. PLS Biplot 분석
+<div align="center">
+ <img src="/figures/result-figure-1-PLS-Biplot-2-Components.png" width="400"/> <img src="/figures/result-figure-2-PLS-Biplot-3-Components.png" width="400"/>
+</div>
+
+2-Components로 분석 결과 정상 거래와 이상 거래는 명확히 분리되기보다는 일부 중첩된 구조를 가진다. 벡터들을 분석하면, `V17`, `V14`, `V12`의 변수가 정상거래에 큰 설명력을 띔을 확인할 수 있다. 반면, 3-Components로 분석한 결과 정상 거래와 이상 거래가 약간 분리됨을 보였다. 특히 `V17` 방향(위의 그림)으로 포맷팅을 하고 확인해 본 결과, 이상 거래 변수들끼리 뭉쳐있으나, 일부 중첩된 부분이 존재되었다. 따라서 변수를 선별하여(변수 축소) 모델링을 진행하는 방법을 선택하였다.
+
+</br>
+<div align="center">
+ <img src="/figures/result-figure-3-VIP-Scores.png" width="500"/>
+ </div>
+
+위의 PLS 분석 결과 기반의 VIP Scores를 산출해 보았다. 기준을 VIP >= 1.21로 둔 다음 분석한 결과 `V17`, `V14`, `V12`, `V10`, `V3`, `V16`, `V7`}이 높은 상관성을 띄었다. 분석 전, 주요 변수라고 생각했던 `Amount`와 `Time`의 경우 낮은 점수를 띄고 있었다. 현재는 데이터가 보안상의 이유로 더 엄밀하게 접근 할 수 없으나, 훗날 데이터가 PCA 차원축소가 되어있지 않다면, 더 다양한 분석 기법을 활용하여 점검할 수 있을 것으로 사료된다.
+
+</br>
 
 ## 3.3. 변수 선정
-
-
-2. 탐색적 자료 분석(EDA, Exploratory Data Analysis)
-- Partial Least Squares(PLS) Regression
-  - 2 Components, 3 Components
-  - VIP Scores from PLS Regression
 - Feature Selection (Top 10)
   - Pearson Correlation
   - Spearman Rank Correlation
