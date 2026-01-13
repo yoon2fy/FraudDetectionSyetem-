@@ -76,14 +76,22 @@
 </br>
 
 ## 3.3. 변수 선정
-- Feature Selection (Top 10)
-  - Pearson Correlation
-  - Spearman Rank Correlation
-  - Ridge Regression
-  - Lasso Regression
-  - Elastic Net
-  - Mutual Information Score(MIS)
-  - PLS - VIP Score
+본 절에서는 여러 기법에서 반복적으로 중요하게 나타난 변수를 선택하여 평균 Rank 기반의 누적평가를 통해 상위 10개의 변수를 선별하려고 한다(Consensus 기반). 사용될 방법론은 아래와 같다.
+
+|그룹	|기법	|중요도 |기준|
+|-|-|-|-|
+|선형 관계|	Pearson	|단변량 선형 상관|
+|        |	Ridge	|다변량 선형 + L2 패널티|
+|        |	Lasso	|다변량 선형 + 변수 선택|
+|        |	Elastic Net	|Ridge + Lasso|
+|비선형 관계|	Spearman	|단변량 순위 상관|
+|          |	MI	|일반적 비선형 의존성|
+|잠재공간 기반|	PLS-VIP	|X–Y 공분산 기여도|
+
+<div align="center">
+ <img src="/figures/result-figure-4-Feature-Selection.png" width="500"/>
+</div>
+분석 결과 상위 10개의 변수는 `V17`, `V14`, `V12`, `V10`, `V7`, `V16`, `V3`, `V11`, `V4`, `V9`이다. 가장 높은 Rank를 차지한 `V17`의 경우 모든 분석 결과에서 높은 관계를 나타내었다. 눈에 띄는 점은 5번째 Rank인 `V7`의 경우 모든 변수 중에서 `Ridge`의 결과가 가장 높았다. 이는 Ridge가 공동 기여 변수를 높게 평가하기 때문이다. `V7`은 단독으로는 약한 변수일 지라도, 다른 변수와 함께 있을 때, 예측에 크게 기여한다는 의미이다.
 
 3. Modeling_ Ensemble modeling - `VotingClassifier`
 - `LogistRegression`, `RandomForestClassifier`, `LGBMClassifier`, `XGBClassifier`
