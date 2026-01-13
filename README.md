@@ -130,14 +130,19 @@
 
 향후 모델 고도화 단계에서는 개별 모델에 대한 하이퍼파라미터 튜닝을 더욱 정교하게 수행하고, 앙상블 내 모델 가중치 조정 및 오류 유형(FP/FN)별 성능 분석을 통해 ROC-AUC 99% 수준의 성능 달성을 목표로 추가적인 개선을 진행할 예정이다.
 
+</br>
 
+# 5. SHAP 기반 XAI를 활용한 분석
+본 절에서는 앙상블 모델의 예측 결과를 바탕으로, 변수 중요도 분석 및 SHAP 값을 활용한 모델 해석, 그리고 오탐(False Positive)과 미탐(False Negative) 관점에서의 오류 분석을 수행하였다. 이를 통해 단순 성능 수치가 아닌, 모델이 어떻게 판단을 내리는지에 대한 해석 가능성을 확보하고자 하였다.
 
-4. Fine Tunning
+## 5.1. Global Interpretation
 
-5. XAI
-- Global XAI
-- Local XAI
-- SHAP Importance Comparison
+<div align="center">
+ <img src="/figures/result-figure-5-global.png" width="500"/>
+</div>
 
-## 최종 코드 및 결과
+SHAP(SHapley Additive exPlanations) 분석 결과를 Global하게 시각화 하기 위해 Beeswarm Plot을 나타내 보았다. 이는 해당 변수의 값이 클 때 예측값을 올리는지 또는 내리는지를 분석하는 값이다. 위 결과를 보면, 대체적으로 밀집되어있는 것이 없으므로 모델은 위 변수들의 변화에 대해 예민하게 반응하였음을 뜻한다.
 
+`V4`의 경우 Feature Value가 높은 값들이 오른쪽에 몰려있다. 이를 보았을 때 `V4`의 값이 클 수록 모델의 예측치를 높인다고 할 수 있다. 반면, `V10`, `V14`의 경우 Feature Value가 낮은 값들이 오른쪽에 몰려있다. 이들의 값이 작을 수록 예측치를 높인다는 의미이다.
+
+여기서 주목할 만한 데이터는 `V17`이다. 앞선 Feature Selection 단계에서 가장 RANK가 높은 변수였기 때문이다. SHAP 분석 결과, `V17`의 값들의 분포는 대체적으로 0큼을 알 수 있다. 하지만, 값들이 섞여 있고, SHAP value가 4-6 일 때는 Feature value가 낮은 값들이 분포하고 있고 SHAP value가 1-4일 때에는 Feature value가 높은 값들이 분포하고 있다. 이를 보았을 때 V17의 값은 모델 내부에서 값이 작을 수록 예측력이 좋다고 해석할 수 있으며, 가장 영향력을 높게 미친 변수라고 판단할 수 있다.
