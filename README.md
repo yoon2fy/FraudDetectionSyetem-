@@ -11,36 +11,40 @@ Python 기반 머신러닝과 Ensemble, SHAP 해석을 결합해 성능과 설�
 ```
 FraudDetectionSystem/
 │
-├── data/
-│   ├── raw/                    # 원본 데이터
-│   ├── processed/              # 전처리 완료 데이터
-│
-├── notebooks/
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_preprocessing.ipynb
-│   ├── 03_feature_selection.ipynb
-│   ├── 04_modeling.ipynb
-│   ├── 05_ensemble_voting.ipynb
-│   ├── 06_evaluation.ipynb
-│   └── 07_shap_analysis.ipynb
-│
 ├── src/
-│   ├── preprocessing.py        # 데이터 정제 및 스케일링
-│   ├── feature_selection.py    # Feature Selection 로직
-│   ├── models.py               # 개별 모델 정의
-│   ├── ensemble.py             # VotingClassifier 구성
-│   ├── evaluation.py           # ROC-AUC, PR, FP/FN 분석
-│   └── utils.py                # 공통 유틸 함수
+│   ├── data/
+│   │   ├── load_data.py               # Google Drive 데이터 다운로드
+│   │   └── preprocess.py              # Log 변환 + Min-Max Scaling
+│   │
+│   ├── features/
+│   │   ├── pls_vip.py                 # PLS Regression + VIP 계산
+│   │   └── feature_selection.py       # Pearson~MI~VIP 통합 변수 선정
+│   │
+│   ├── models/
+│   │   ├── train_lgbm.py              # LightGBM 단일 모델 학습
+│   │   └── voting_ensemble.py         # Soft Voting Ensemble
+│   │
+│   ├── evaluation/
+│   │   ├── metrics.py                 # ROC-AUC 평가
+│   │   └── fp_fn_analysis.py          # FP / FN 인덱스 및 비교 분석
+│   │
+│   ├── explainability/
+│   │   ├── shap_global.py             # SHAP Global 해석 (summary plot)
+│   │   ├── shap_importance.py        # SHAP importance 해석 (FP / FN 사례)
+│   │   └── shap_local.py              # SHAP Local 해석 (FP / FN 사례)
+│   │
+│   └── imports/                                # 패키지 형상관리
 │
-├── results/
-│   ├── metrics/                # 성능 지표 저장
-│   ├── figures/                # 시각화 결과 (ROC, SHAP 등)
-│   └── shap/                   # Global / Local SHAP 결과
-│
-├── README.md
-├── requirements.txt
-└── .gitignore
-
+├── figures/
+│   ├── readme.md
+│   ├── result-figure-1-PLS-Biplot-2-Components.png
+│   ├── result-figure-2-PLS-Biplot-3-Components.png
+│   ├── result-figure-3-VIP-Scores.png
+│   ├── result-figure-4-Feature-Selection.png
+│   ├── result-figure-5-global.png
+│   ├── result-figure-6-local.png
+│   └── result-figure-7-importance.png
+└── README.md
 ```
 
 ---
