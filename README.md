@@ -2,7 +2,7 @@
 💳 FraudDetectionSyetem (가제)
 
 ## 프로젝트 기간
-2026.01.11.Sun ~ 2023.01.14.Wed (4 days)
+2026.01.11.Sun ~ 2023.01.16.Fri (6 days)
 
 # 1. 문제 정의
 ## 1.1. 프로젝트 시나리오 개요
@@ -146,3 +146,12 @@ SHAP(SHapley Additive exPlanations) 분석 결과를 Global하게 시각화 하�
 `V4`의 경우 Feature Value가 높은 값들이 오른쪽에 몰려있다. 이를 보았을 때 `V4`의 값이 클 수록 모델의 예측치를 높인다고 할 수 있다. 반면, `V10`, `V14`의 경우 Feature Value가 낮은 값들이 오른쪽에 몰려있다. 이들의 값이 작을 수록 예측치를 높인다는 의미이다.
 
 여기서 주목할 만한 데이터는 `V17`이다. 앞선 Feature Selection 단계에서 가장 RANK가 높은 변수였기 때문이다. SHAP 분석 결과, `V17`의 값들의 분포는 대체적으로 0큼을 알 수 있다. 하지만, 값들이 섞여 있고, SHAP value가 4-6 일 때는 Feature value가 낮은 값들이 분포하고 있고 SHAP value가 1-4일 때에는 Feature value가 높은 값들이 분포하고 있다. 이를 보았을 때 V17의 값은 모델 내부에서 값이 작을 수록 예측력이 좋다고 해석할 수 있으며, 가장 영향력을 높게 미친 변수라고 판단할 수 있다.
+
+## 5.2. Local Interpretation
+<div align="center">
+ <img src="/figures/result-figure-6-local.png" width="600"/>
+</div>
+
+위 그림은 SHAP local force plot이다. Base value는 약 -7로, 전체 데이터 기준 평균적인 모델의 출력값임을 뜻한다. 최종 예측값은 f(x)=-11.82로, 따라서 해당 샘플 값(local값)은 평균적인 경우보다 더 음성(negative)방향으로 강하게 예측된 값이다.
+
+본 local 사례는 다수의 주요 변수들이(`V12`, `V20`, `V18` 등) 일관되게 음의 방향으로 작용하며 예측값을 크게 하락시키는 구조를 보였다. 예측값은 decision boundary로부터 충분히 멀리 위치해 있어, 모델이 불확실성 없이 Negative 클래스로 분류한 사례로 해석된다. 이는 FP(False Positive, 모델이 Positive로 잘못 예측한 경우) 또는 FN(False Negative, 모델이 Negative로 잘못 예측한 경우)과 같은 경계 오류보다는, 모델이 학습한 전형적인 Negative 패턴을 충실히 반영한 TN(True Negative) 사례에 해당할 가능성이 높으므로, 본 프로젝트에서 개발한 앙상블 모델은 XAI 기법에 의하여 정상에 가깝다고 설명할 수 있다.
