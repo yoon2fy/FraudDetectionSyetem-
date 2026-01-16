@@ -155,3 +155,18 @@ SHAP(SHapley Additive exPlanations) 분석 결과를 Global하게 시각화 하�
 위 그림은 SHAP local force plot이다. Base value는 약 -7로, 전체 데이터 기준 평균적인 모델의 출력값임을 뜻한다. 최종 예측값은 f(x)=-11.82로, 따라서 해당 샘플 값(local값)은 평균적인 경우보다 더 음성(negative)방향으로 강하게 예측된 값이다.
 
 본 local 사례는 다수의 주요 변수들이(`V12`, `V20`, `V18` 등) 일관되게 음의 방향으로 작용하며 예측값을 크게 하락시키는 구조를 보였다. 예측값은 decision boundary로부터 충분히 멀리 위치해 있어, 모델이 불확실성 없이 Negative 클래스로 분류한 사례로 해석된다. 이는 FP(False Positive, 모델이 Positive로 잘못 예측한 경우) 또는 FN(False Negative, 모델이 Negative로 잘못 예측한 경우)과 같은 경계 오류보다는, 모델이 학습한 전형적인 Negative 패턴을 충실히 반영한 TN(True Negative) 사례에 해당할 가능성이 높으므로, 본 프로젝트에서 개발한 앙상블 모델은 XAI 기법에 의하여 정상에 가깝다고 설명할 수 있다.
+
+## 5.3. FP / FN 관점에서의 SHAP 기반 오류 특성 종합 분석
+<div align="center">
+ <img src="/figures/result-figure-7-importance.png" width="600"/>
+</div>
+
+앞선 Global 및 Local SHAP 분석을 바탕으로, 본 절에서는 오탐(False Positive)과 미탐(False Negative) 사례에서의 변수 기여도를 비교 분석하여 모델 오류의 구조적 특성을 종합적으로 살펴보았다.
+
+FP와 FN 샘플을 대상으로 평균 절대 SHAP 값을 비교한 결과, 두 오류 유형은 상이한 특성을 보였다. FP의 경우 `V17`이 다른 변수들에 비해 압도적으로 높은 SHAP 값을 보이며, 특정 핵심 변수가 과도하게 Positive 방향으로 작용할 때 오탐이 발생하는 경향이 확인되었다. 이는 Global 해석에서 중요도가 높았던 변수가 개별 예측에서는 오히려 오류 요인으로 작용할 수 있음을 시사한다.
+
+반면 FN의 경우 `V10`, `V4`, `V12`, `V14`, `V16` 등 다수 변수들이 비교적 고르게 분포하며 기여하는 양상을 보였다. 이는 단일 변수의 극단적인 값보다는 여러 변수의 누적된 영향으로 인해 실제 Positive 샘플이 Negative로 분류되는 구조임을 의미한다.
+
+이러한 결과는 Local Interpretation에서 확인된 TN 사례와도 일관된다. 해당 사례는 다수의 주요 변수가 강하게 음의 방향으로 작용하며 decision boundary로부터 충분히 떨어진 예측값을 형성하였으며, 이는 FN과 같은 경계 오류가 아닌 모델이 학습한 전형적인 Negative 패턴에 기반한 판단임을 뒷받침한다.
+
+종합적으로, SHAP 기반 XAI 분석을 통해 본 앙상블 모델은 단순한 예측 성능을 넘어, 오류 발생의 원인과 구조를 명확히 설명할 수 있음을 확인하였다. 이는 모델의 신뢰성과 해석 가능성을 동시에 확보했다는 점에서 본 연구의 중요한 의의라 할 수 있다.
