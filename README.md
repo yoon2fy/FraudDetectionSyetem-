@@ -1,5 +1,10 @@
 # 💳 Fraud Detection System
-Python 기반 머신러닝과 Ensemble, SHAP 해석을 결합해 성능과 설명 가능성을 동시에 고려한 금융 사기 탐지 모델을 구현한 프로젝트
+<div align="center">
+ <img width="838" height="402" alt="image" src="https://github.com/user-attachments/assets/ebcb9329-6b45-47f6-8113-8cd582389e13" />
+</div>
+
+Python 기반 머신러닝과 Ensemble, SHAP 해석을 결합해 성능과 설명 가능성을 동시에 고려한 금융 사기 탐지 모델을 구현한 프로젝트 (v.1.0.0)
+ - 다음 버전에서는 DB 서버와 연결해 볼 계획입니다. (2026-01-21 작성)
 
 ## 프로젝트 기간
 2026.01.11 ~ 2026.01.16 (6 days)
